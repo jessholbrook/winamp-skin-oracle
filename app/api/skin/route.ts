@@ -54,11 +54,21 @@ const SPEC_SCHEMA = {
 } as const;
 
 export async function POST(req: Request) {
-  const { qa } = (await req.json()) as {
-    qa: { question: string; answer: string }[];
+  const body = (await req.json()) as {
+    qa?: { question?: unknown; answer?: unknown }[];
   };
 
-  if (!qa?.length) {
+  // Clamp untrusted input server-side: the client's 3-question / 200-char
+  // limits are advisory, and the transcript goes straight into a paid prompt.
+  const qa = (Array.isArray(body.qa) ? body.qa : [])
+    .slice(0, 3)
+    .map((p) => ({
+      question: String(p?.question ?? "").slice(0, 300),
+      answer: String(p?.answer ?? "").slice(0, 300),
+    }))
+    .filter((p) => p.answer.trim());
+
+  if (!qa.length) {
     return NextResponse.json({ error: "missing answers" }, { status: 400 });
   }
 
@@ -70,7 +80,7 @@ export async function POST(req: Request) {
     const client = new Anthropic();
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 2000,
       system:
         "You are the design engine of a mystical Winamp skin generator. " +

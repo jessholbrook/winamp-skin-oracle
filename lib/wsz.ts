@@ -31,8 +31,9 @@ function cnv(w: number, h: number): [HTMLCanvasElement, Ctx] {
 }
 
 // ---------- 24-bit BMP encoder ----------
+// Exported (along with buildZip / viscolorTxt) for unit tests.
 
-function canvasToBMP(canvas: HTMLCanvasElement): Uint8Array {
+export function canvasToBMP(canvas: HTMLCanvasElement): Uint8Array {
   const w = canvas.width, h = canvas.height;
   const rgba = canvas.getContext("2d")!.getImageData(0, 0, w, h).data;
   const stride = (w * 3 + 3) & ~3;
@@ -82,7 +83,7 @@ function crc32(data: Uint8Array): number {
 const DOS_DATE = ((2026 - 1980) << 9) | (6 << 5) | 11; // fixed, deterministic
 const DOS_TIME = (12 << 11) | (0 << 5);
 
-function buildZip(files: { name: string; data: Uint8Array }[]): Blob {
+export function buildZip(files: { name: string; data: Uint8Array }[]): Blob {
   const enc = new TextEncoder();
   const parts: Uint8Array[] = [];
   const central: Uint8Array[] = [];
@@ -340,7 +341,7 @@ function eqmainBmp(spec: SkinSpec, seedText: string): Uint8Array {
   px(ctx, 0, 0, 275, 315, c.bgDark);
 
   // ---- window background (0,0 275x116) ----
-  const rand = seededRand(seedText + spec.skinName + "eq");
+  const rand = seededRand(seedText + "eq");
   drawChassisTexture(ctx, spec, rand, 0, 14, 275, 102);
   drawTitleBar(ctx, c, "EQUALIZER", 0, 0, 275, true); // under the real titlebar sprite
   // graph display well at (86,17) 113x19
@@ -432,7 +433,7 @@ function pleditBmp(spec: SkinSpec, seedText: string): Uint8Array {
   const c = spec.colors;
   const [canvas, ctx] = cnv(280, 186);
   px(ctx, 0, 0, 280, 186, c.bgDark);
-  const rand = seededRand(seedText + spec.skinName + "pl");
+  const rand = seededRand(seedText + "pl");
   const tex = (x: number, y: number, w: number, h: number) =>
     drawChassisTexture(ctx, spec, rand, x, y, w, h);
 
@@ -562,7 +563,7 @@ function pleditBmp(spec: SkinSpec, seedText: string): Uint8Array {
 
 // ---------- text files ----------
 
-function viscolorTxt(spec: SkinSpec): string {
+export function viscolorTxt(spec: SkinSpec): string {
   const c = spec.colors;
   const lines: string[] = [];
   const [br, bg, bb] = hexToRgb(c.bgDark);

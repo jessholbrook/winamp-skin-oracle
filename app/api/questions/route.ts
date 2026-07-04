@@ -15,6 +15,8 @@ const QUESTIONS_SCHEMA = {
     questions: {
       type: "array",
       items: { type: "string" },
+      minItems: 3,
+      maxItems: 3,
       description: "Exactly three short, surreal questions",
     },
   },
@@ -28,8 +30,11 @@ export async function GET() {
     const seed = Math.random().toString(36).slice(2, 8);
 
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
+      model: "claude-sonnet-5",
       max_tokens: 2000,
+      // Questions are latency-sensitive and simple; skip adaptive thinking
+      // (on by default on Sonnet 5 when the field is omitted).
+      thinking: { type: "disabled" },
       system:
         "You generate intake questions for a mystical machine that designs classic Winamp skins. " +
         "The questions must be short (under 20 words each), nonsensical, surreal, and slightly unsettling in a funny way. " +

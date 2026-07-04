@@ -253,7 +253,7 @@ export function renderSkin(canvas: HTMLCanvasElement, spec: SkinSpec, seedText: 
   canvas.height = SKIN_H;
   const ctx = canvas.getContext("2d")!;
   const c = spec.colors;
-  const rand = seededRand(seedText + spec.skinName);
+  const rand = seededRand(seedText);
 
   // ---- chassis + texture ----
   px(ctx, 0, 0, SKIN_W, SKIN_H, c.bgDark);

@@ -1,9 +1,10 @@
-// Captures README screenshots from the running dev server (localhost:3711).
+// Captures README screenshots from the running dev server.
+// Port 3711 matches .claude/launch.json; override with PORT=xxxx.
 // Usage: node scripts/screenshots.mjs
 import puppeteer from "puppeteer-core";
 import { mkdirSync } from "fs";
 
-const BASE = "http://localhost:3711";
+const BASE = `http://localhost:${process.env.PORT ?? 3711}`;
 const OUT = "screenshots";
 mkdirSync(OUT, { recursive: true });
 
