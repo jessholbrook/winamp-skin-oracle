@@ -52,21 +52,24 @@ export default function Home() {
     }
   }, [phase, spec, answers]);
 
-  // Webamp live preview — recreated whenever the spec changes (e.g. rename)
+  // Webamp live preview — recreated whenever the spec changes (e.g. rename).
+  // Debounced: rebuilding the whole engine per rename keystroke is expensive,
+  // so intermediate spec values are dropped before they ever mount.
   useEffect(() => {
     if (!showWebamp || !spec || phase !== "result") return;
     let cancelled = false;
     let url = "";
-    (async () => {
+    const timer = setTimeout(async () => {
       const Webamp = (await import("webamp")).default;
       if (cancelled || !webampStageRef.current) return;
       url = URL.createObjectURL(buildWSZBlob(spec, answers.join("|")));
       const webamp = new Webamp({ initialSkin: { url } }) as unknown as WebampInstance;
       webampRef.current = webamp;
       await webamp.renderWhenReady(webampStageRef.current);
-    })();
+    }, 350);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
       webampRef.current?.dispose();
       webampRef.current = null;
       if (url) URL.revokeObjectURL(url);
@@ -80,6 +83,9 @@ export default function Home() {
     try {
       const res = await fetch("/api/questions");
       const data = await res.json();
+      if (!res.ok || !Array.isArray(data.questions) || data.questions.length < 3) {
+        throw new Error("bad questions response");
+      }
       setQuestions(data.questions);
       setAnswers([]);
       setCurrent(0);
@@ -92,6 +98,7 @@ export default function Home() {
   }
 
   async function submitAnswer() {
+    if (phase !== "quiz") return; // guard double-fire (rapid Enter + click)
     const answer = draft.trim();
     if (!answer) return;
     const nextAnswers = [...answers, answer];
@@ -113,6 +120,7 @@ export default function Home() {
         }),
       });
       const data = await res.json();
+      if (!res.ok || !data.spec?.colors) throw new Error("bad skin response");
       setSpec(data.spec);
       setPhase("result");
     } catch {
@@ -156,6 +164,7 @@ export default function Home() {
               type="text"
               value={draft}
               maxLength={200}
+              aria-label="your answer"
               placeholder="answer truthfully (or not)"
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submitAnswer()}
@@ -180,6 +189,7 @@ export default function Home() {
               value={spec.skinName}
               maxLength={32}
               spellCheck={false}
+              aria-label="skin name"
               title="click to rename"
               onChange={(e) => setSpec({ ...spec, skinName: e.target.value })}
             />

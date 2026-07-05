@@ -8,7 +8,7 @@ The oracle asks you things like *"What does the static between radio stations sm
 
 ## Features
 
-- **Model-generated questions** — Claude (Sonnet 4.6) writes three fresh surreal questions per session, each secretly probing a design axis (color/light, texture/material, mood/energy)
+- **Model-generated questions** — Claude (Sonnet 5) writes three fresh surreal questions per session, each secretly probing a design axis (color/light, texture/material, mood/energy)
 - **Model-generated designs** — your answers become an 8-color palette, a texture (`scanlines · noise · checker · diagonal · gradient`), a window shape, a skin name in authentic late-90s skin-site style, and a one-line `readme.txt`-grade vibe
 - **Real `.wsz` export** — a genuine Winamp 2.x skin archive with all three windows fully skinned:
   - `MAIN.BMP`, `TITLEBAR.BMP`, `CBUTTONS.BMP`, `NUMBERS.BMP`, `TEXT.BMP`, `VOLUME.BMP`, `BALANCE.BMP`, `POSBAR.BMP`, `MONOSTER.BMP`, `PLAYPAUS.BMP`, `SHUFREP.BMP`
